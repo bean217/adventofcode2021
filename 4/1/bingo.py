@@ -1,6 +1,6 @@
 class Bingo:
     def __init__(self):
-        self.winner = None
+        self.winner = []
         self.num_seq = []
         self.boards = []
 
@@ -20,8 +20,18 @@ class Bingo:
                     break
             if winner:
                 break
-        self.winner = winner
-        return winner
+        self.winner += [winner]
+    
+    def run_game_last_winner(self):
+        winner = None
+        for val in self.num_seq:
+            for i in range(len(self.boards)):
+                if self.boards[i].isWon:
+                    continue
+                self.boards[i].check_for_val(val)
+                if self.boards[i].isWon:
+                    winner = (i, self.boards[i].calc_score(val))
+                    self.winner += [winner]
                 
 
 class Board:
@@ -95,8 +105,9 @@ def main():
                 bingo.add_board(board)
     for b in bingo.boards:
         print(b)
-    bingo.run_game()
-    print(bingo.winner)    
+    # bingo.run_game()
+    bingo.run_game_last_winner()
+    print(bingo.winner[-1])    
 
 if __name__ == "__main__":
     main()
