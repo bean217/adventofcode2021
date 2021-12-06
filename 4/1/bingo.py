@@ -1,5 +1,6 @@
 class Bingo:
     def __init__(self):
+        self.winner = None
         self.num_seq = []
         self.boards = []
 
@@ -9,9 +10,27 @@ class Bingo:
     def add_board(self, board):
         self.boards += [board]
 
+    def run_game(self):
+        winner = None
+        for val in self.num_seq:
+            for i in range(len(self.boards)):
+                self.boards[i].check_for_val(val)
+                if self.boards[i].isWon:
+                    winner = (i, self.boards[i].calc_score(val))
+                    break
+            if winner:
+                break
+        self.winner = winner
+        return winner
+                
+
 class Board:
     def __init__(self):
         self.board = [[0]*5]*5
+        self.calledRows = [0]*5
+        self.calledCols = [0]*5
+        self.avail_nums = set()
+        self.isWon = False
 
     def __str__(self):
         result = ""
@@ -24,9 +43,34 @@ class Board:
                     result += " "
             result += "\n"
         return result
+    
+    def check_for_val(self, val):
+        # find value in board
+        if val in self.avail_nums:
+            self.avail_nums.remove(val)
+            val_pos = None
+            for j in range(5): # j ~= row
+                for i in range(5): # i ~= col
+                    if self.board[j][i] == val:
+                        val_pos = (j, i)
+            if val_pos:
+                self.calledRows[val_pos[0]] += 1
+                self.calledCols[val_pos[1]] += 1
+            for q in self.calledRows:
+                if q == 5:
+                    self.isWon = True
+            for q in self.calledCols:
+                if q == 5:
+                    self.isWon = True
+    
+    def calc_score(self, last_called_val):
+        sum = 0
+        for val in self.avail_nums:
+            sum += val
+        return sum * last_called_val
 
 def main():
-    with open('test') as f:
+    with open('input') as f:
         # first line is the game number sequence
         bingo = Bingo()
         for line in f:
@@ -43,14 +87,16 @@ def main():
                 board = Board()
                 row_num = 0
                 continue
-            line = [int(i) for i in line.split()]
-            board.board[row_num] = line
+            board.board[row_num] = [int(i) for i in line.split()]
+            for val in board.board[row_num]:
+                board.avail_nums.add(val)
             row_num += 1
             if row_num == 5:
                 bingo.add_board(board)
-        for b in bingo.boards:
-            print(b)
-
+    for b in bingo.boards:
+        print(b)
+    bingo.run_game()
+    print(bingo.winner)    
 
 if __name__ == "__main__":
     main()
