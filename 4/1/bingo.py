@@ -17,10 +17,10 @@ class Board:
         result = ""
         for j in range(5):
             for i in range(5):
-                if (self.board[i][j] < 10):
+                if (self.board[j][i] < 10):
                     result += " "
                 result += f'{str(self.board[j][i])}'
-                if (i != 4):
+                if (i < 4):
                     result += " "
             result += "\n"
         return result
@@ -44,10 +44,10 @@ def main():
                 row_num = 0
                 continue
             line = [int(i) for i in line.split()]
-            for i in range(5):
-                board.board[row_num][i] = line[i]
-            bingo.add_board(board)
+            board.board[row_num] = line
             row_num += 1
+            if row_num == 5:
+                bingo.add_board(board)
         for b in bingo.boards:
             print(b)
 
