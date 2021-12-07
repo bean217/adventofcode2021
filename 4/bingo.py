@@ -36,7 +36,7 @@ class Bingo:
 
 class Board:
     def __init__(self):
-        self.board = [[0]*5]*5
+        self.board = [[0]*5 for _ in range(5)]
         self.calledRows = [0]*5
         self.calledCols = [0]*5
         self.avail_nums = set()
