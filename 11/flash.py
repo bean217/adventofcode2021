@@ -48,7 +48,7 @@ def step_and_count_flashes(field, y_dim, x_dim):
     while len(flashed_stack) > 0:
         y, x = flashed_stack.pop()
         field[y][x] = 0
-    display(field)
+    #display(field)
     return field, count
 
 
@@ -56,22 +56,48 @@ def count_flashes(field, rounds, y_dim, x_dim):
     flashes = 0
     curr_field = field
     for _ in range(rounds):
+        #print(_+1)
         temp_flashes = 0
         curr_field, temp_flashes = step_and_count_flashes(curr_field, y_dim, x_dim)
         flashes += temp_flashes
-        print()
+        #print()
     return flashes
+
+
+def find_nav_round(field, y_dim, x_dim):
+    curr_field = field
+    round = 0
+    while True:
+        round += 1
+        #print(f'Round: {round}')
+        curr_field, flashes = step_and_count_flashes(curr_field, y_dim, x_dim)
+        if flashes == y_dim * x_dim:
+            return round
+
+
+def make_hard_copy(arr_2d):
+    result = []
+    for j in range(len(arr_2d)):
+        result += [[i for i in arr_2d[j]]]
+    #display(arr_2d)
+    return result
+
+
 
 def main():
     fname = 'input'
     rounds = 100
     field = get_init_field(fname)
-    display(field)
+    #display(field)
     print()
     y_dim = len(field)
     x_dim = len(field[0])
-    flashes = count_flashes(field, rounds, y_dim, x_dim)
+    field_copy = make_hard_copy(field)
+    flashes = count_flashes(field_copy, rounds, y_dim, x_dim)
     print(f'Flashes: {flashes}')
+    field_copy = make_hard_copy(field)
+    nav_round = find_nav_round(field_copy, y_dim, x_dim)
+    print(f'All Octopuses Flash At Round: {nav_round}')
 
 if __name__ == "__main__":
     main()
