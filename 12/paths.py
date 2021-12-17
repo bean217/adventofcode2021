@@ -13,25 +13,34 @@ def copy(arr):
     return a_copy
 
 
+def copy_dict(d):
+    copy = dict()
+    for key in d.keys():
+        copy[key] = d[key]
+    return copy
+
+
 def is_small_cave(cave_str):
     return ord(cave_str[0]) >= ord('a') and ord(cave_str[0]) <= ord('z')
 
 
-def evaluate_paths(graph, stack, visited=[], curr_path=[], paths=[]):
+def evaluate_paths(graph, stack, visited={"start": 2}, curr_path=[], paths=[]):
     temp_stack = []
     curr = stack.pop()
     curr_path += [curr]
     if is_small_cave(curr):
-        visited += [curr]
+        if curr not in visited.keys():
+            visited[curr] = 0
+        visited[curr] += 1
     if curr == "end":
         #print(curr_path)
         paths += [curr_path]
         return None
     for node in graph[curr]:
-        if node not in visited:
+        if node not in visited.keys() or (node in visited and 2 not in visited.values()):
             temp_stack += [node]
             #print("added")
-            evaluate_paths(graph, temp_stack, copy(visited), copy(curr_path), paths)
+            evaluate_paths(graph, temp_stack, copy_dict(visited), copy(curr_path), paths)
     return paths
 
 
@@ -57,11 +66,7 @@ def main():
     stack = []
     stack.append("start")
     paths = evaluate_paths(graph, stack)
-    for path in paths:
-        if len(path) > 7:
-            print(path[:7] + ['...'])
-        else:
-            print(path)
+
     print(f'{len(paths)} paths.')
 
 
