@@ -40,12 +40,6 @@ def read_data(fname, size_x, size_y):
     return paper, instructions
 
 
-def abs(x):
-    if x < 0:
-        return -1 * x
-    return x
-
-
 def display(paper):
     count = 0
     for j in range(len(paper)):
@@ -59,10 +53,10 @@ def display(paper):
 
 
 def fold_vert(paper, axis, dim_x, dim_y):
-    for j in range(axis):
+    for j in range(dim_y - (axis + 1)):
         for i in range(dim_x):
-            if paper[j][i] == '#' or paper[dim_y - 1 - j][i] == '#':
-                paper[j][i] = '#'
+            if paper[axis - (j+1)][i] == '#' or paper[axis + (j+1)][i] == '#':
+                paper[axis - (j+1)][i] = '#'
     # 11 // 2 = 5 01234 5 6789X
     # 10 // 2 = 5 01234 56789
     return paper[:axis]
@@ -71,9 +65,9 @@ def fold_vert(paper, axis, dim_x, dim_y):
 
 def fold_horiz(paper, axis, dim_x, dim_y):
     for j in range(dim_y):
-        for i in range(axis):
-            if paper[j][i] == '#' or paper[j][dim_x - 1 - i] == '#':
-                paper[j][i] = '#'
+        for i in range(dim_x - (axis + 1)):
+            if paper[j][axis - (i+1)] == '#' or paper[j][axis + (i+1)] == '#':
+                paper[j][axis - (i+1)] = '#'
     # 11 // 2 = 5 01234 5 6789X
     # 10 // 2 = 5 01234 56789
     return [line[:axis] for line in paper]
@@ -93,61 +87,19 @@ def fold_paper(paper, instructions, dim_x, dim_y):
         size_x = len(curr_paper[0])
         display(curr_paper)
         print(f"size_x: {size_x}, size_y: {size_y}")
-
-
-def perform_instructions(paper, instructions, dim_x, dim_y):
-    size_x = dim_x
-    size_y = dim_y
-    curr_paper = paper
-    for instruction in instructions:
-        high = -instruction[1]
-        low = instruction[1]
-        if instruction[0] == 'x':
-            high += size_x
-        else: # instruction[0] == 'y'
-            high += size_y
-        cust_range = abs(low)
-        if abs(high) < cust_range:
-            cust_range = abs(high)
-        print(f'cust_range: {cust_range}')
-        if instruction[0] == 'x':
-            mod = 0
-            if (size_x % 2 == 0):
-                mod = 1
-            for i in range(cust_range):
-                for j in range(size_y):
-                    if curr_paper[j][instruction[1] + i] == '#' or curr_paper[j][instruction[1] - i] == '#':
-                        curr_paper[j][instruction[1] - i] = '#'
-            for j in range(len(curr_paper)):
-                curr_paper[j] = curr_paper[j][:instruction[1] + mod]
-            size_x = len(curr_paper[0])
-        else: # instruction[0] == 'y'
-            mod = 0
-            if (size_y % 2 == 0):
-                mod = 1
-            for j in range(cust_range):
-                #print(j)
-                for i in range(size_x):
-                    #print(f'\t{i}')
-                    if curr_paper[instruction[1] + j][i] == '#' or curr_paper[instruction[1] - j][i] == '#':
-                        curr_paper[instruction[1] - j][i] = '#'
-            curr_paper = curr_paper[:instruction[1] + mod]
-            size_y = len(curr_paper)
-        print()
-        display(curr_paper)
-        print(f'({len(curr_paper)}, {len(curr_paper[0])})')
     return curr_paper
 
 def main():
-    fname = 'test'
+    fname = 'input'
     dim_x, dim_y = get_dimensions(fname)
     print(f'X-dim: {dim_x}\nY-dim: {dim_y}')
     paper, instructions = read_data(fname, dim_x, dim_y)
-    #for line in instructions:
-    #    print(line)
-    #display(paper)
-    #paper = perform_instructions(paper, instructions, dim_x, dim_y)
-    fold_paper(paper, instructions, dim_x, dim_y)
+    paper = fold_paper(paper, instructions, dim_x, dim_y)
+    with open('output.txt', 'w+') as f:
+        for line in paper:
+            for char in line:
+                f.write(char)
+            f.write('\n')
 
 if __name__ == "__main__":
     main()
