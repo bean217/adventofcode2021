@@ -70,7 +70,14 @@ class Graph:
         with open(fname) as f:
             for line in f:
                 self.graph += [[int(val) for val in line.strip()]]
-        self.visited
+        self.visited = set()
+    
+    def run_dijkstras(self):
+        # (y, x)
+        start = (0, 0)
+        end = (len(self.graph), len(self.graph[0]))
+        q = MinHeap()
+        
 
 def read_graph(fname):
     graph = []
@@ -86,19 +93,7 @@ def main():
     #for row in graph:
     #    print(row)
     heap = MinHeap()
-    print(heap)
-    heap.add(5)
-    print(heap)
-    heap.add(6)
-    print(heap)
-    heap.add(1)
-    print(heap)
-    heap.add(0)
-    print(heap)
-    while heap.size > 0:
-        heap.remove()
-        print(heap)
-    heap.remove()
-    print(heap)
+    
+
 if __name__ == "__main__":
     main()
