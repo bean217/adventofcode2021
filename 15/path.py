@@ -1,20 +1,5 @@
 import sys
 
-class Node:
-    def __init__(self, value, y, x):
-        self.val = value
-        self.pos = (y, x)
-        self.dist = sys.maxsize
-        self.path = None
-        self.adj = []
-
-    def __lt__(self, other):
-        return self.dist < other.dist
-    
-    def __str__(self):
-        return f'[{self.val}]{self.pos}'
-
-
 class MinHeap:
     def __init__(self):
         self.heap = []
@@ -25,7 +10,7 @@ class MinHeap:
         self.heap += [node]
         index = self.size - 1
         if index != 0:
-            while self.heap[(index-1)//2].dist > node.dist:
+            while self.heap[(index-1)//2].val > node.val:
                 temp = self.heap[(index-1)//2]
                 self.heap[(index-1)//2] = node
                 self.heap[index] = temp
@@ -73,6 +58,31 @@ class MinHeap:
     def __str__(self):
         return self.heap.__str__()
 
+
+class Position:
+    def __init__(self, y, x):
+        self.y = y
+        self.x = x
+    
+    def __str__(self):
+        return f'({self.y}, {self.x})'
+
+class Node:
+    def __init__(self, value, y, x):
+        self.val = value
+        self.pos = Position(y, x)
+        self.dist = sys.maxsize
+        self.path = None
+        self.adj = []
+        self.visited = False
+
+    def __lt__(self, other):
+        return self.dist < other.dist
+    
+    def __str__(self):
+        return f'[{self.val}]{self.pos}'
+
+
 class Graph:
     def __init__(self, fname):
         self.graph = []
@@ -88,71 +98,31 @@ class Graph:
             for i in range(self.size_x):
                 node = self.graph[j][i]
                 # y direction
-                if j > 0:
+                if node.pos.y > 0:
                     node.adj += [self.graph[j-1][i]]
-                if j < self.size_y - 1:
+                if node.pos.y < self.size_y - 1:
                     node.adj += [self.graph[j+1][i]]
                 # x direction
-                if i > 0:
+                if node.pos.x > 0:
                     node.adj += [self.graph[j][i-1]]
-                if i < self.size_x - 1:
+                if node.pos.x < self.size_x - 1:
                     node.adj += [self.graph[j][i+1]]
-        self.visited = set()
-    
-    def run_dijkstras(self):
-        # (y, x)
+        for row in self.graph:
+            print([node.__str__() for node in row])
+            for node in row:
+                print(f'\t{[w.__str__() for w in node.adj]}')
+
+    def run_dijkstras():
         end = None
-        q = MinHeap()
-        node = self.graph[0][0]
-        node.dist = 0
-        q.add(node)
-        
-        #print([val for val in self.visited])
-        while q.size > 0:
-            v = q.remove()
-            #print([val for val in self.visited])
-            #print(v)
-            if (f'{v.pos}' not in self.visited):
-                if v.pos[0] == self.size_y-1 and v.pos[1] == self.size_x-1:
-                    end = v
-                self.visited.add(f'{v.pos}')
-            for w in v.adj:
-                if v.dist + w.val < w.dist:
-                    w.dist = v.dist + w.val
-                    w.path = v
-                if f'{w.pos}' not in self.visited:
-                    if w not in q.heap:
-                        q.add(w)
-                    else:
-                        q.heap.sort()
-        curr = end
-        string = ""
-        cost = 0
-        print(end.path)
-        while curr != None:
-            if curr.path != None:
-                cost += curr.val
-            string = f' {curr.__str__()} >' + string
-            curr = curr.path
-        print(string)
-        return end.dist
-
-
-def read_graph(fname):
-    graph = []
-    with open(fname) as f:
-        for line in f:
-            graph += [[int(val) for val in line.strip()]]
-    return graph
-
 
 def main():
-    fname = 'input'
+    fname = 'st'
     graph = Graph(fname)
-    #for row in graph:
-    #    print(row)
-    res = graph.run_dijkstras()
-    print(f'Risk: {res}')
+    q = MinHeap()
+    q.add(Node(3, 0, 0))
+    q.add(Node(1, 0, 0))
+    q.add(Node(2, 0, 0))
+    print([n.__str__() for n in q.heap])
 
 if __name__ == "__main__":
     main()
